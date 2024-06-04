@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
+const axios = require('axios');
 
 const app = express(); // Create the Express application
 const port = process.env.PORT || 3000; // Use environment variable or default to 3000
@@ -54,6 +55,23 @@ app.get('/health', (req, res) => {
   res.status(200).send('Server is healthy');
 });
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
+  // Start the keep-alive mechanism
+  keepServerAlive();
 });
+
+// Function to keep the server alive
+const keepServerAlive = () => {
+  const interval = 45 * 1000; // 45 seconds
+
+  setInterval(async () => {
+    try {
+      const response = await axios.get(`http://localhost:${port}/health`);
+      console.log(`Keep-alive ping: ${response.data}`);
+    } catch (error) {
+      console.error('Error keeping server alive:', error);
+    }
+  }, interval);
+};
