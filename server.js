@@ -36,7 +36,7 @@ app.post('/api/generate-pdf', async (req, res) => {
       format: 'A4', 
       landscape: true,
       printBackground: true,
-      margin: { top: '30px', right: '30px', bottom: '30px', left: '30px' }
+      margin: { top: '25px', right: '25px', bottom: '25px', left: '25px' }
     });
 
     await browser.close();
