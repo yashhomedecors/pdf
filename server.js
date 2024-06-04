@@ -64,7 +64,7 @@ app.listen(port, () => {
 
 // Function to keep the server alive
 const keepServerAlive = () => {
-  const interval = 45 * 1000; // 45 seconds
+  const interval = 49.5 * 1000; 
 
   setInterval(async () => {
     try {
