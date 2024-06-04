@@ -3,6 +3,20 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
 
+const app = express(); // Create the Express application
+const port = process.env.PORT || 3000; // Use environment variable or default to 3000
+
+// Configure CORS
+app.use(cors({
+  origin: '*', // This allows any origin. In production, specify your client's domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Parse JSON bodies
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 app.post('/api/generate-pdf', async (req, res) => {
   try {
     const { htmlContent, clientName } = req.body;
@@ -34,6 +48,12 @@ app.post('/api/generate-pdf', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Add a health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is healthy');
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
