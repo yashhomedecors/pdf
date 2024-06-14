@@ -3,18 +3,17 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
 const axios = require('axios');
+const moment = require('moment');
 
-const app = express(); // Create the Express application
-const port = process.env.PORT || 3000; // Use environment variable or default to 3000
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Configure CORS
 app.use(cors({
-  origin: '*', // This allows any origin. In production, specify your client's domain
+  origin: '*',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Parse JSON bodies
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -50,28 +49,21 @@ app.post('/api/generate-pdf', async (req, res) => {
   }
 });
 
-// Add a health check endpoint
+const currDate = moment().format("DD MMM YYYY HH:mm:ss");
 app.get('/health', (req, res) => {
-  res.status(200).send('Server is healthy');
+  res.status(200).send(`Server is healthy at ${currDate}`);
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
-  // Start the keep-alive mechanism
-  keepServerAlive();
+  setInterval(keepServerAlive, 28 * 1000); // Check every 60 seconds
 });
 
-// Function to keep the server alive
-const keepServerAlive = () => {
-  const interval = 49.5 * 1000; 
-
-  setInterval(async () => {
-    try {
-      const response = await axios.get(`http://localhost:${port}/health`);
-      console.log(`Keep-alive ping: ${response.data}`);
-    } catch (error) {
-      console.error('Error keeping server alive:', error);
-    }
-  }, interval);
+const keepServerAlive = async () => {
+  try {
+    const response = await axios.get(`http://localhost:${port}/health`);
+    console.log(`Keep-alive ping: ${response.data}`);
+  } catch (error) {
+    console.error('Error keeping server alive:', error);
+  }
 };
